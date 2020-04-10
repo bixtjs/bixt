@@ -1,0 +1,22 @@
+{
+  "name": "example",
+  "version": "0.0.0",
+  "description": "> TODO: description",
+  "author": "Ganesha <reekoheek@gmail.com>",
+  "homepage": "",
+  "license": "MIT",
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "dev": "bixt",
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  },
+  "devDependencies": {
+    "bixt": "^0.0.0",
+    "debug": "^4.1.1",
+    "mocha": "^7.1.1"
+  },
+  "dependencies": {
+    "bono": "^1.1.0"
+  }
+}

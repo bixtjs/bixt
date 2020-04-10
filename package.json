@@ -1,0 +1,24 @@
+{
+  "name": "bixt",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "lint": "eslint .",
+    "dev": "lerna run dev --stream --no-prefix --scope bixt",
+    "test": "lerna run test --scope bixt --stream --no-prefix -- -- --colors"
+  },
+  "author": "Ganesha <reekoheek@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^6.8.0",
+    "eslint-config-standard": "^14.1.1",
+    "eslint-config-xinix": "^1.1.13",
+    "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-mocha": "^6.3.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1",
+    "lerna": "^3.20.2"
+  }
+}

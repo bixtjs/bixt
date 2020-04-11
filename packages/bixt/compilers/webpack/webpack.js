@@ -9,6 +9,7 @@ const debug = require('debug')('bixt:builder:compilers:webpack');
 module.exports = class WebpackCompiler {
   constructor ({ server }) {
     this.server = server;
+    this.assets = {};
   }
 
   getIgnores ({ workDir }) {
@@ -28,8 +29,14 @@ module.exports = class WebpackCompiler {
 
     await next();
 
+    const assetId = `${srcDir}/index.js`;
     const indexTpl = require('./templates/index-js');
-    await fs.writeFile(`${srcDir}/index.js`, await indexTpl(ctx));
+    const assetContent = await indexTpl(ctx);
+    if (!this.assets[assetId] ||this.assets[assetId] !== assetContent) {
+      debug('Asset changed:', assetId);
+      this.assets[assetId] = assetContent;
+      await fs.writeFile(assetId, assetContent);
+    }
 
     const config = {
       mode: ctx.mode,
@@ -80,22 +87,42 @@ module.exports = class WebpackCompiler {
         new MiniCssExtractPlugin(),
       ],
     };
-    const compiler = webpack(config);
-
-    debug('Webpack building ...');
 
     await new Promise((resolve, reject) => {
-      compiler.run((err, stats) => {
-        if (err) return reject(err);
+      if (ctx.mode === 'development') {
+        if (this.webpackCompiler) {
+          resolve();
+        } else {
+          debug('Webpack watching (%o) ...', ctx.mode);
+          const compiler = this.webpackCompiler = webpack(config);
+          const watchOptions = {};
+          compiler.watch(watchOptions, (err, stats) => {
+            if (err) return reject(err);
 
-        stats.compilation.errors.forEach(err => {
-          console.error(err);
+            stats.compilation.errors.forEach(err => {
+              console.error(err);
+            });
+
+            debug('Webpack build done ...');
+
+            resolve();
+          });
+        }
+      } else {
+        debug('Webpack building (%o) ...', ctx.mode);
+        const compiler = webpack(config);
+        compiler.run((err, stats) => {
+          if (err) return reject(err);
+
+          stats.compilation.errors.forEach(err => {
+            console.error(err);
+          });
+
+          resolve();
         });
-
-        resolve();
-      });
+        debug('Webpack build done');
+      }
     });
-    debug('Webpack build');
 
     this.server.use(require('koa-static')(wwwDir, { defer: true }));
     this.server.use(async (ctx, next) => {

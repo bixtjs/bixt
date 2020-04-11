@@ -32,7 +32,7 @@ module.exports = class WebpackCompiler {
     const assetId = `${srcDir}/index.js`;
     const indexTpl = require('./templates/index-js');
     const assetContent = await indexTpl(ctx);
-    if (!this.assets[assetId] ||this.assets[assetId] !== assetContent) {
+    if (!this.assets[assetId] || this.assets[assetId] !== assetContent) {
       debug('Asset changed:', assetId);
       this.assets[assetId] = assetContent;
       await fs.writeFile(assetId, assetContent);
@@ -97,10 +97,13 @@ module.exports = class WebpackCompiler {
           const compiler = this.webpackCompiler = webpack(config);
           const watchOptions = {};
           compiler.watch(watchOptions, (err, stats) => {
-            if (err) return reject(err);
+            if (err) {
+              console.error('[WEBPACK]', err);
+              return resolve();
+            }
 
             stats.compilation.errors.forEach(err => {
-              console.error(err);
+              console.error('[WEBPACK COMPILATION]', err);
             });
 
             debug('Webpack build done ...');
@@ -115,7 +118,7 @@ module.exports = class WebpackCompiler {
           if (err) return reject(err);
 
           stats.compilation.errors.forEach(err => {
-            console.error(err);
+            console.error('[WEBPACK COMPILATION]', err);
           });
 
           resolve();

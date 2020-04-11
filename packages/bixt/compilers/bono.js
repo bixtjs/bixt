@@ -30,7 +30,9 @@ module.exports = class BonoCompiler {
     this.server.router = router;
   }
 
-  handle ({ file, uri, bundler, router }) {
+  handle (ctx) {
+    const { file, uri, bundler, router } = ctx;
+
     if (path.extname(file) !== '.js') {
       return false;
     }
@@ -39,6 +41,7 @@ module.exports = class BonoCompiler {
     try {
       exported = require(file);
     } catch (err) {
+      ctx.esnext = true;
       return;
     }
 

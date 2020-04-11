@@ -1,6 +1,6 @@
 import { LitElement, html } from 'lit-element';
 
-export default class Bar extends LitElement {
+export default class Home extends LitElement {
   render () {
     return html`
       <div>
@@ -9,7 +9,7 @@ export default class Bar extends LitElement {
         <a href="/bar">Bar</a>
       </div>
       <div>
-        [bar]
+        [home]
       </div>
     `;
   }

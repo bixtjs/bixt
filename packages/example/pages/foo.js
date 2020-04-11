@@ -1,13 +1,20 @@
-const Bundle = require('bono');
+import { LitElement, html } from 'lit-element';
 
-module.exports = class extends Bundle {
-  constructor () {
-    super();
-
-    this.get('/', ctx => {
-      return {
-        foo: 'foo',
-      };
-    });
+export default class Foo extends LitElement {
+  render () {
+    return html`
+      <div>
+        <a href="/">Home</a>
+        <a href="/foo">Foo</a>
+        <a href="/bar">Bar</a>
+      </div>
+      <div>
+        [foo]
+      </div>
+    `;
   }
-};
+
+  createRenderRoot () {
+    return this;
+  }
+}

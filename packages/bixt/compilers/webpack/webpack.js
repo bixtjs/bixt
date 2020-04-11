@@ -3,7 +3,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const fs = require('fs-extra');
 const path = require('path');
-
+const Route = require('bono/route');
 const debug = require('debug')('bixt:builder:compilers:webpack');
 
 module.exports = class WebpackCompiler {
@@ -23,11 +23,13 @@ module.exports = class WebpackCompiler {
     const wwwDir = path.join(ctx.workDir, 'www');
 
     await fs.ensureDir(srcDir);
-    await fs.writeFile(`${srcDir}/index.js`, 'console.log(\'Hello world\')');
 
-    this.server.use(require('koa-static')(wwwDir, { defer: true }));
+    const webpackPages = ctx.webpackPages = [];
 
     await next();
+
+    const indexTpl = require('./templates/index-js');
+    await fs.writeFile(`${srcDir}/index.js`, await indexTpl(ctx));
 
     const config = {
       mode: ctx.mode,
@@ -80,13 +82,49 @@ module.exports = class WebpackCompiler {
     };
     const compiler = webpack(config);
 
+    debug('Webpack building ...');
+
     await new Promise((resolve, reject) => {
       compiler.run((err, stats) => {
         if (err) return reject(err);
+
+        stats.compilation.errors.forEach(err => {
+          console.error(err);
+        });
+
         resolve();
       });
     });
-
     debug('Webpack build');
+
+    this.server.use(require('koa-static')(wwwDir, { defer: true }));
+    this.server.use(async (ctx, next) => {
+      await next();
+
+      if (ctx.method !== 'HEAD' && ctx.method !== 'GET') {
+        return;
+      }
+
+      if (ctx.body != null || ctx.status !== 404) return;
+
+      // console.log(ctx.method, ctx.path, webpackPages);
+      const found = webpackPages.find(page => page.route.match(ctx));
+      if (found) {
+        ctx.originalPath = ctx.path;
+        ctx.path = '/';
+      }
+    });
+  }
+
+  handle (ctx) {
+    if (path.extname(ctx.file) !== '.js' || !ctx.esnext) {
+      return false;
+    }
+
+    const { file, uri } = ctx;
+    const name = 'x' + file.split(ctx.workDir).pop().replace(/[./\\{}]/g, '-');
+    const route = new Route(uri);
+    ctx.webpackPages.push({ file, name, uri, route });
+    return true;
   }
 };

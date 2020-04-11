@@ -10,6 +10,10 @@ module.exports = function (_, { err } = {}) {
 
     Options:
       -h, --help         print usage information
+      -d, --work-dir     change working directory (default: cwd)
+
+    Environment variables
+      PORT               change port (default: 3000)
   `);
 
   if (err) {

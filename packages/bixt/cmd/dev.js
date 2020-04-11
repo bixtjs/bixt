@@ -12,6 +12,6 @@ module.exports = async function dev (args, opts) {
       new WebpackCompiler({ server }),
     ],
   });
-  await builder.watch();
+  await builder.watch({ mode: 'development' });
   await server.listen();
 };

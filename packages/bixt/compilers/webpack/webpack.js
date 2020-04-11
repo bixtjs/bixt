@@ -1,6 +1,8 @@
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
+const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const fs = require('fs-extra');
 const path = require('path');
 const Route = require('bono/route');
@@ -29,64 +31,22 @@ module.exports = class WebpackCompiler {
 
     await next();
 
-    const assetId = `${srcDir}/index.js`;
-    const indexTpl = require('./templates/index-js');
-    const assetContent = await indexTpl(ctx);
-    if (!this.assets[assetId] || this.assets[assetId] !== assetContent) {
-      debug('Asset changed:', assetId);
-      this.assets[assetId] = assetContent;
-      await fs.writeFile(assetId, assetContent);
+    await this.generateTemplate(ctx, `${srcDir}/index.js`);
+
+    const customHtml = path.join(ctx.workDir, 'index.html');
+    if (await fs.exists(customHtml)) {
+      const assetId = `${srcDir}/index.html`;
+      const assetContent = await fs.readFile(customHtml, 'utf8');
+      if (!this.assets[assetId] || this.assets[assetId] !== assetContent) {
+        debug('Asset copied:', assetId);
+        this.assets[assetId] = assetContent;
+        await fs.writeFile(assetId, assetContent);
+      }
+    } else {
+      await this.generateTemplate(ctx, `${srcDir}/index.html`);
     }
 
-    const config = {
-      mode: ctx.mode,
-      entry: {
-        index: `${srcDir}/index.js`,
-      },
-      output: {
-        path: `${wwwDir}`,
-      },
-      devtool: 'sourcemap',
-      module: {
-        rules: [
-          {
-            test: /\.p?css$/,
-            use: [
-              MiniCssExtractPlugin.loader,
-              { loader: 'css-loader', options: { importLoaders: 1 } },
-              'postcss-loader',
-            ],
-          },
-          {
-            test: /\.(svg|png|ico|jpe?g|gif)(\?.*)?$/i,
-            use: {
-              loader: 'url-loader',
-              options: {
-                limit: 1,
-              },
-            },
-          },
-          {
-            test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/i,
-            use: {
-              loader: 'url-loader',
-              options: {
-                limit: 1,
-              },
-            },
-          },
-        ],
-      },
-      plugins: [
-        new HtmlWebpackPlugin({
-          // template: './src/index.html',
-        }),
-        // new FaviconsWebpackPlugin({
-        //   logo: './src/assets/logo.png',
-        // }),
-        new MiniCssExtractPlugin(),
-      ],
-    };
+    const config = await this.getConfig(ctx);
 
     await new Promise((resolve, reject) => {
       if (ctx.mode === 'development') {
@@ -156,5 +116,105 @@ module.exports = class WebpackCompiler {
     const route = new Route(uri);
     ctx.webpackPages.push({ file, name, uri, route });
     return true;
+  }
+
+  async generateTemplate (ctx, assetId) {
+    const tplId = path.basename(assetId).replace(/[._]/g, '-');
+    const tpl = require(`./templates/${tplId}`);
+    const assetContent = await tpl(ctx);
+    if (!this.assets[assetId] || this.assets[assetId] !== assetContent) {
+      debug('Asset generated:', assetId);
+      this.assets[assetId] = assetContent;
+      await fs.writeFile(assetId, assetContent);
+    }
+  }
+
+  getConfig (ctx) {
+    const srcDir = path.join(ctx.workDir, '.bixt');
+    const wwwDir = path.join(ctx.workDir, 'www');
+
+    const baseConfig = {
+      mode: ctx.mode,
+      entry: {
+        index: `${srcDir}/index.js`,
+      },
+      output: {
+        path: `${wwwDir}`,
+      },
+      devtool: 'sourcemap',
+      module: {
+        rules: [
+          {
+            test: /\.p?css$/,
+            use: [
+              MiniCssExtractPlugin.loader,
+              {
+                loader: require.resolve('css-loader'),
+                options: { importLoaders: 1 },
+              },
+              {
+                loader: require.resolve('postcss-loader'),
+                options: {
+                  plugins: [
+                    require('postcss-import')({}),
+                    require('postcss-url')({}),
+                    require('postcss-preset-env')({
+                      features: {
+                        'nesting-rules': true,
+                      },
+                    }),
+                    // '@fullhuman/postcss-purgecss': {
+                    //   content: ['./src/**/*.js'],
+                    // },
+                    // cssnano: {},
+                  ],
+                },
+
+              },
+            ],
+          },
+          {
+            test: /\.(svg|png|ico|jpe?g|gif)(\?.*)?$/i,
+            use: {
+              loader: require.resolve('url-loader'),
+              options: {
+                limit: 1,
+              },
+            },
+          },
+          {
+            test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/i,
+            use: {
+              loader: require.resolve('url-loader'),
+              options: {
+                limit: 1,
+              },
+            },
+          },
+        ],
+      },
+      plugins: [
+        new HtmlWebpackPlugin({
+          template: `${srcDir}/index.html`,
+        }),
+        // new FaviconsWebpackPlugin({
+        //   logo: './src/assets/logo.png',
+        // }),
+        new MiniCssExtractPlugin(),
+      ],
+      optimization: {
+        minimize: ctx.mode === 'production',
+        minimizer: [
+          new TerserPlugin({}),
+          new OptimizeCSSAssetsPlugin({}),
+        ],
+      },
+    };
+
+    try {
+      return require(path.join(ctx.workDir, 'webpack.config.js'))(baseConfig, ctx);
+    } catch (err) {
+      return baseConfig;
+    }
   }
 };

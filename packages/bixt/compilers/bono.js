@@ -21,6 +21,10 @@ module.exports = class BonoCompiler {
     this.server.middleware.splice(0, this.server.middleware.length - 1);
     this.server.use(require('bono/middlewares/json')({ debug: ctx.mode === 'development' }));
 
+    (ctx.config.serverMiddlewares || []).forEach(mw => {
+      this.server.use(mw);
+    });
+
     const bundler = ctx.bundler = new Bundler();
     const router = ctx.router = new Router();
 

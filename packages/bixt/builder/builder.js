@@ -62,12 +62,21 @@ class Builder {
     debug('Build complete');
   }
 
+  getConfig () {
+    try {
+      return require(path.join(this.workDir, 'bixt.config.js'));
+    } catch (err) {
+      return {};
+    }
+  }
+
   async runBuild ({ mode }) {
     const run = compose(this.compilers.map(compiler => (ctx, next) => compiler.compile(ctx, next)));
 
     const ctx = {
       mode,
       workDir: this.workDir,
+      config: this.getConfig(),
     };
 
     await run(ctx, async ctx => {

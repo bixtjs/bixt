@@ -17,6 +17,7 @@
     "bono": "^1.1.0",
     "chokidar": "^3.3.1",
     "css-loader": "^3.5.2",
+    "file-loader": "^6.0.0",
     "fs-extra": "^9.0.0",
     "html-webpack-plugin": "^4.2.0",
     "klaw": "^3.0.0",
@@ -24,7 +25,10 @@
     "lit-element": "^2.3.1",
     "mini-css-extract-plugin": "^0.9.0",
     "minimist": "^1.2.5",
+    "postcss-import": "^12.0.1",
     "postcss-loader": "^3.0.0",
+    "postcss-preset-env": "^6.7.0",
+    "postcss-url": "^8.0.0",
     "url-loader": "^4.1.0",
     "webpack": "^4.42.1"
   },
@@ -33,6 +37,8 @@
     "lit-element": "^2.3.1",
     "litx-router": "^1.0.3",
     "mocha": "^7.1.1",
-    "postcss-loader": "^3.0.0"
+    "optimize-css-assets-webpack-plugin": "^5.0.3",
+    "postcss-loader": "^3.0.0",
+    "terser-webpack-plugin": "^2.3.5"
   }
 }

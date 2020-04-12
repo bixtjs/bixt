@@ -1,18 +1,37 @@
 const chokidar = require('chokidar');
-const debug = require('debug')('bixt:builder:builder');
 const path = require('path');
 const walk = require('./walk');
 const compose = require('koa-compose');
+const WebpackCompiler = require('../compilers/webpack');
+const BonoCompiler = require('../compilers/bono');
+const logInfo = require('../logger')('bixt:builder:builder');
+const colors = require('colors');
 
 class Builder {
-  constructor ({ workDir = process.cwd(), compilers = [] }) {
+  constructor ({
+    workDir = process.cwd(),
+    server,
+    compilers = [
+      new BonoCompiler({ server }),
+      new WebpackCompiler({ server }),
+    ],
+    handlers = [
+      require('../handlers/detect')(),
+      require('../handlers/custom-index')(),
+      require('../handlers/custom-app')(),
+      require('../handlers/custom-notfound')(),
+      require('../handlers/bono')(),
+      require('../handlers/webpack-page')(),
+    ],
+  }) {
     this.workDir = path.resolve(workDir);
     this.pageDir = path.join(this.workDir, 'pages');
     this.compilers = compilers;
+    this.handlers = handlers;
   }
 
   async watch ({ mode } = {}) {
-    debug('Watching', this.workDir, '...');
+    logInfo('Watching', this.workDir, '...');
 
     const compilerIgnores = [];
     for (const k in this.compilers) {
@@ -28,7 +47,7 @@ class Builder {
       ],
     });
 
-    await new Promise((resolve, reject) => {
+    await new Promise(resolve => {
       let waitTimeout;
       let invoked = false;
       const listener = (file) => {
@@ -36,13 +55,13 @@ class Builder {
         waitTimeout = setTimeout(async () => {
           try {
             await this.build({ mode });
+          } catch (err) {
+            console.error('[WATCHER]', err);
+          } finally {
             if (!invoked) {
               invoked = true;
               resolve();
             }
-          } catch (err) {
-            console.error('[WATCHER]', err);
-            resolve();
           }
         }, 300);
       };
@@ -55,11 +74,11 @@ class Builder {
 
   async build ({ mode = 'production' } = {}) {
     await this.buildComplete;
-    debug('Building ...');
+    logInfo('Building ...');
 
     this.buildComplete = this.runBuild({ mode });
     await this.buildComplete;
-    debug('Build complete');
+    logInfo('Build complete');
   }
 
   getConfig () {
@@ -81,23 +100,23 @@ class Builder {
 
     await run(ctx, async ctx => {
       await walk(this.pageDir, async file => {
-        ctx.file = file;
-        ctx.uri = this.pathToUri(file);
+        const uri = this.pathToUri(file);
+        const shortFile = file.split(ctx.workDir).pop().slice(1);
 
-        let handled;
-        for (const k in this.compilers) {
+        ctx.chunk = { file, uri, shortFile };
+
+        for (const handler of this.handlers) {
           try {
-            handled = await this.compilers[k].handle(ctx);
-            if (handled) {
-              debug('Handle %s -> %s [%s]', file, ctx.uri, this.compilers[k].constructor.name);
+            if (await handler(ctx)) {
+              logInfo('Handling [%s] %s -> %s [%s]', colors.green('done'), shortFile, uri, handler.name);
               return;
             }
           } catch (err) {
-            console.error('[BUILD]', err);
+            console.error('[HANDLE]', err);
           }
         }
 
-        throw new Error(`Unhandled file ${file}`);
+        logInfo('Handling [%s] %s -> %s', colors.red('fail'), shortFile, uri);
       });
     });
   }

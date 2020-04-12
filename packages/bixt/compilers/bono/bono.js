@@ -33,40 +33,4 @@ module.exports = class BonoCompiler {
     this.server.bundler = bundler;
     this.server.router = router;
   }
-
-  handle (ctx) {
-    const { file, uri, bundler, router } = ctx;
-
-    if (path.extname(file) !== '.js') {
-      return false;
-    }
-
-    let exported;
-    try {
-      exported = require(file);
-    } catch (err) {
-      ctx.esnext = true;
-      return false;
-    }
-
-    const exportedType = typeof exported;
-    if (exportedType === 'object') {
-      bundler.set(uri, exported);
-      return true;
-    }
-
-    const firstLine = exported.toString().split('\n').shift();
-    if (firstLine.match(/class/)) {
-      const ExportedBundle = exported;
-      bundler.set(uri, new ExportedBundle());
-      return true;
-    }
-
-    if (firstLine.match(/=>|function/)) {
-      const route = require(file);
-      const methods = route.methods || ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'];
-      router.route(methods, uri, route);
-      return true;
-    }
-  }
 };

@@ -29,13 +29,13 @@ module.exports = async ({ webpackPages, config, workDir, webpackCustomApp, webpa
             }
           },
         }
-      `.trim()).join(',')},
+      `.trim()).join(',\n')},
     ],
     middlewares: [
-      ${middlewares.map(mw => `require('${mw}').default`).join(',')}
+      ${middlewares.map(mw => `require('${mw}').default`).join(',\n')}
     ],
     routes: [
-      ${webpackPages.map(({ name, uri }) => JSON.stringify({ uri, view: name })).join(',')},
+      ${webpackPages.map(({ name, uri }) => JSON.stringify({ uri, view: name })).join(',\n')},
       {
         uri: '*',
         view: 'bixt-notfound-view',

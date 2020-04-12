@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 const CMD_HELP = require('../cmd/help');
 const DEFAULT_COMMAND = 'dev';
+const logError = require('../logger')('bixt:bin', 'error');
 
 (async () => {
   try {
@@ -20,7 +21,7 @@ const DEFAULT_COMMAND = 'dev';
     const [command, args, opts] = parseCommand(argv);
     await command(args, opts);
   } catch (err) {
-    console.error(err);
+    logError(err);
     process.exit(1);
   }
 })();
@@ -41,9 +42,5 @@ function parseCommand (argv) {
   };
   delete opts._;
 
-  try {
-    return [require(`../cmd/${cmd || DEFAULT_COMMAND}`), args, opts];
-  } catch (err) {
-    return [CMD_HELP, args, { err }];
-  }
+  return [require(`../cmd/${cmd || DEFAULT_COMMAND}`), args, opts];
 }

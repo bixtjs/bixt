@@ -5,8 +5,8 @@ const TerserPlugin = require('terser-webpack-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const fs = require('fs-extra');
 const path = require('path');
-const Route = require('bono/route');
-const debug = require('debug')('bixt:builder:compilers:webpack');
+const logInfo = require('../../logger')('bixt:compilers:webpack');
+
 module.exports = class WebpackCompiler {
   constructor ({ server }) {
     this.server = server;
@@ -39,7 +39,7 @@ module.exports = class WebpackCompiler {
         if (this.webpackCompiler) {
           resolve();
         } else {
-          debug('Webpack watching (%o) ...', ctx.mode);
+          logInfo('Webpack watching (%o) ...', ctx.mode);
           const compiler = this.webpackCompiler = webpack(config);
           const watchOptions = {};
           compiler.watch(watchOptions, (err, stats) => {
@@ -52,13 +52,13 @@ module.exports = class WebpackCompiler {
               console.error('[WEBPACK COMPILATION]', err);
             });
 
-            debug('Webpack build done ...');
+            logInfo('Webpack build done ...');
 
             resolve();
           });
         }
       } else {
-        debug('Webpack building (%o) ...', ctx.mode);
+        logInfo('Webpack building (%o) ...', ctx.mode);
         const compiler = webpack(config);
         compiler.run((err, stats) => {
           if (err) return reject(err);
@@ -69,40 +69,12 @@ module.exports = class WebpackCompiler {
 
           resolve();
         });
-        debug('Webpack build done');
+        logInfo('Webpack build done');
       }
     });
 
     this.server.use(require('koa-static')(ctx.webpackWwwDir, { defer: true }));
     this.server.use(require('./middlewares/push-state')(ctx));
-  }
-
-  handle (ctx) {
-    const fileExt = path.extname(ctx.file);
-    if (ctx.uri === '/_index' && fileExt === '.html') {
-      ctx.webpackCustomIndex = ctx.file;
-      return true;
-    }
-
-    if (fileExt !== '.js' || !ctx.esnext) {
-      return false;
-    }
-
-    if (ctx.uri === '/_app') {
-      ctx.webpackCustomApp = ctx.file;
-      return true;
-    }
-
-    if (ctx.uri === '/_notfound') {
-      ctx.webpackCustomNotFound = ctx.file;
-      return true;
-    }
-
-    const { file, uri } = ctx;
-    const name = 'x' + file.split(ctx.workDir).pop().replace(/[./\\{}]/g, '-');
-    const route = new Route(uri);
-    ctx.webpackPages.push({ file, name, uri, route });
-    return true;
   }
 
   async generateTemplate (ctx, assetId, override) {
@@ -118,7 +90,7 @@ module.exports = class WebpackCompiler {
     }
 
     if (!this.assets[assetId] || this.assets[assetId] !== assetContent) {
-      debug(`Asset ${isOverriden ? 'overriden' : 'generated'}:`, assetId);
+      logInfo(`Asset ${isOverriden ? 'overriden' : 'generated'}:`, assetId);
       this.assets[assetId] = assetContent;
       await fs.writeFile(assetId, assetContent);
     }
@@ -173,6 +145,10 @@ module.exports = class WebpackCompiler {
 
               },
             ],
+          },
+          {
+            test: /\.html?$/i,
+            use: require.resolve('html-loader'),
           },
           {
             test: /\.(svg|png|ico|jpe?g|gif)(\?.*)?$/i,

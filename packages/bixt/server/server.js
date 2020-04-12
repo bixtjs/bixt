@@ -2,7 +2,7 @@ const Bundle = require('bono/bundle');
 const http = require('http');
 // const https = require('https');
 
-// const debug = require('debug')('bixt:server:server');
+const logInfo = require('../logger')('bixt:server:server');
 
 const kServer = Symbol('server');
 
@@ -28,7 +28,7 @@ class Server extends Bundle {
           return reject(err);
         }
 
-        console.info(`Bixt Server listening at http${this.https ? 's' : ''}://${this.hostname}:${this.port}`);
+        logInfo(`Bixt Server listening at http${this.https ? 's' : ''}://${this.hostname}:${this.port}`);
         resolve();
       });
     });

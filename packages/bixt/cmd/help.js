@@ -1,22 +1,20 @@
-module.exports = function (_, { err } = {}) {
-  console.info(`
-    Usage:
-      bixt [<command>] [options]
+const logInfo = require('../logger')('bixt:cmd:help');
 
-    Commands:
-      dev                start development (default)
-      build              build static files
-      start              start production server
+module.exports = function () {
+  logInfo(`
+Usage:
+  bixt [<command>] [options]
 
-    Options:
-      -h, --help         print usage information
-      -d, --work-dir     change working directory (default: cwd)
+Commands:
+  dev                start development (default)
+  build              build static files
+  start              start production server
 
-    Environment variables
-      PORT               change port (default: 3000)
+Options:
+  -h, --help         print usage information
+  -d, --work-dir     change working directory (default: cwd)
+
+Environment variables
+  PORT               change port (default: 3000)
   `);
-
-  if (err) {
-    throw err;
-  }
 };

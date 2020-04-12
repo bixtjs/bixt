@@ -32,7 +32,7 @@ module.exports = class WebpackCompiler {
     await next();
 
     await this.generateTemplate(ctx, `${srcDir}/index.js`);
-    await this.generateTemplate(ctx, `${srcDir}/index.html`, path.join(ctx.workDir, 'index.html'));
+    await this.generateTemplate(ctx, `${srcDir}/index.html`, ctx.webpackCustomIndex);
 
     const config = await this.getConfig(ctx);
 
@@ -95,7 +95,13 @@ module.exports = class WebpackCompiler {
   }
 
   handle (ctx) {
-    if (path.extname(ctx.file) !== '.js' || !ctx.esnext) {
+    const fileExt = path.extname(ctx.file);
+    if (ctx.uri === '/_index' && fileExt === '.html') {
+      ctx.webpackCustomIndex = ctx.file;
+      return true;
+    }
+
+    if (fileExt !== '.js' || !ctx.esnext) {
       return false;
     }
 

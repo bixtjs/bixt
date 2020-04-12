@@ -32,19 +32,7 @@ module.exports = class WebpackCompiler {
     await next();
 
     await this.generateTemplate(ctx, `${srcDir}/index.js`);
-
-    const customHtml = path.join(ctx.workDir, 'index.html');
-    if (await fs.exists(customHtml)) {
-      const assetId = `${srcDir}/index.html`;
-      const assetContent = await fs.readFile(customHtml, 'utf8');
-      if (!this.assets[assetId] || this.assets[assetId] !== assetContent) {
-        debug('Asset copied:', assetId);
-        this.assets[assetId] = assetContent;
-        await fs.writeFile(assetId, assetContent);
-      }
-    } else {
-      await this.generateTemplate(ctx, `${srcDir}/index.html`);
-    }
+    await this.generateTemplate(ctx, `${srcDir}/index.html`, path.join(ctx.workDir, 'index.html'));
 
     const config = await this.getConfig(ctx);
 
@@ -111,6 +99,11 @@ module.exports = class WebpackCompiler {
       return false;
     }
 
+    if (ctx.uri === '/_app') {
+      ctx.webpackCustomApp = ctx.file;
+      return true;
+    }
+
     const { file, uri } = ctx;
     const name = 'x' + file.split(ctx.workDir).pop().replace(/[./\\{}]/g, '-');
     const route = new Route(uri);
@@ -118,12 +111,20 @@ module.exports = class WebpackCompiler {
     return true;
   }
 
-  async generateTemplate (ctx, assetId) {
-    const tplId = path.basename(assetId).replace(/[._]/g, '-');
-    const tpl = require(`./templates/${tplId}`);
-    const assetContent = await tpl(ctx);
+  async generateTemplate (ctx, assetId, override) {
+    let assetContent;
+    let isOverriden = false;
+    if (await fs.exists(override)) {
+      assetContent = await fs.readFile(override, 'utf8');
+      isOverriden = true;
+    } else {
+      const tplId = path.basename(assetId);
+      const tpl = require(`./templates/${tplId}.tpl.js`);
+      assetContent = await tpl(ctx);
+    }
+
     if (!this.assets[assetId] || this.assets[assetId] !== assetContent) {
-      debug('Asset generated:', assetId);
+      debug(`Asset ${isOverriden ? 'overriden' : 'generated'}:`, assetId);
       this.assets[assetId] = assetContent;
       await fs.writeFile(assetId, assetContent);
     }

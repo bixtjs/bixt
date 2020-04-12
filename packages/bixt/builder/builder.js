@@ -89,7 +89,7 @@ class Builder {
           try {
             handled = await this.compilers[k].handle(ctx);
             if (handled) {
-              debug('Handle', ctx.uri, '->', file);
+              debug('Handle %s -> %s [%s]', file, ctx.uri, this.compilers[k].constructor.name);
               return;
             }
           } catch (err) {

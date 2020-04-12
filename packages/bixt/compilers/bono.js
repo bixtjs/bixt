@@ -63,7 +63,9 @@ module.exports = class BonoCompiler {
     }
 
     if (firstLine.match(/=>|function/)) {
-      router.route(['GET', 'POST', 'PUT', 'PATCH', 'DELETE'], uri, require(file));
+      const route = require(file);
+      const methods = route.methods || ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'];
+      router.route(methods, uri, route);
       return true;
     }
   }

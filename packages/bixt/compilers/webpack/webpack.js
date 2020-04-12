@@ -7,7 +7,6 @@ const fs = require('fs-extra');
 const path = require('path');
 const Route = require('bono/route');
 const debug = require('debug')('bixt:builder:compilers:webpack');
-
 module.exports = class WebpackCompiler {
   constructor ({ server }) {
     this.server = server;
@@ -22,17 +21,16 @@ module.exports = class WebpackCompiler {
   }
 
   async compile (ctx, next) {
-    const srcDir = path.join(ctx.workDir, '.bixt');
-    const wwwDir = path.join(ctx.workDir, 'www');
+    ctx.webpackSrcDir = path.join(ctx.workDir, '.bixt');
+    ctx.webpackWwwDir = path.join(ctx.workDir, 'www');
+    ctx.webpackPages = [];
 
-    await fs.ensureDir(srcDir);
-
-    const webpackPages = ctx.webpackPages = [];
+    await fs.ensureDir(ctx.webpackSrcDir);
 
     await next();
 
-    await this.generateTemplate(ctx, `${srcDir}/index.js`);
-    await this.generateTemplate(ctx, `${srcDir}/index.html`, ctx.webpackCustomIndex);
+    await this.generateTemplate(ctx, `${ctx.webpackSrcDir}/index.js`);
+    await this.generateTemplate(ctx, `${ctx.webpackSrcDir}/index.html`, ctx.webpackCustomIndex);
 
     const config = await this.getConfig(ctx);
 
@@ -75,23 +73,8 @@ module.exports = class WebpackCompiler {
       }
     });
 
-    this.server.use(require('koa-static')(wwwDir, { defer: true }));
-    this.server.use(async (ctx, next) => {
-      await next();
-
-      if (ctx.method !== 'HEAD' && ctx.method !== 'GET') {
-        return;
-      }
-
-      if (ctx.body != null || ctx.status !== 404) return;
-
-      // console.log(ctx.method, ctx.path, webpackPages);
-      const found = webpackPages.find(page => page.route.match(ctx));
-      if (found) {
-        ctx.originalPath = ctx.path;
-        ctx.path = '/';
-      }
-    });
+    this.server.use(require('koa-static')(ctx.webpackWwwDir, { defer: true }));
+    this.server.use(require('./middlewares/push-state')(ctx));
   }
 
   handle (ctx) {
@@ -142,16 +125,13 @@ module.exports = class WebpackCompiler {
   }
 
   getConfig (ctx) {
-    const srcDir = path.join(ctx.workDir, '.bixt');
-    const wwwDir = path.join(ctx.workDir, 'www');
-
     const baseConfig = {
       mode: ctx.mode,
       entry: {
-        index: `${srcDir}/index.js`,
+        index: `${ctx.webpackSrcDir}/index.js`,
       },
       output: {
-        path: `${wwwDir}`,
+        path: `${ctx.webpackWwwDir}`,
         publicPath: '/',
       },
       devtool: 'sourcemap',
@@ -216,7 +196,7 @@ module.exports = class WebpackCompiler {
       },
       plugins: [
         new HtmlWebpackPlugin({
-          template: `${srcDir}/index.html`,
+          template: `${ctx.webpackSrcDir}/index.html`,
         }),
         // new FaviconsWebpackPlugin({
         //   logo: './src/assets/logo.png',

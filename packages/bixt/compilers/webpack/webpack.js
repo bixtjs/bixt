@@ -148,7 +148,14 @@ module.exports = class WebpackCompiler {
           {
             test: /\.p?css$/,
             use: [
-              MiniCssExtractPlugin.loader,
+              {
+                loader: require.resolve('file-loader'),
+                options: {
+                  name: '[hash].css',
+                },
+              },
+              require.resolve('extract-loader'),
+              // MiniCssExtractPlugin.loader,
               {
                 loader: require.resolve('css-loader'),
                 options: { importLoaders: 1 },
@@ -179,7 +186,7 @@ module.exports = class WebpackCompiler {
             use: {
               loader: require.resolve('url-loader'),
               options: {
-                limit: 1,
+                limit: 48,
               },
             },
           },
@@ -188,7 +195,7 @@ module.exports = class WebpackCompiler {
             use: {
               loader: require.resolve('url-loader'),
               options: {
-                limit: 1,
+                limit: 48,
               },
             },
           },
@@ -201,7 +208,7 @@ module.exports = class WebpackCompiler {
         // new FaviconsWebpackPlugin({
         //   logo: './src/assets/logo.png',
         // }),
-        new MiniCssExtractPlugin(),
+        // new MiniCssExtractPlugin(),
       ],
       optimization: {
         minimize: ctx.mode === 'production',

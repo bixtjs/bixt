@@ -46,7 +46,7 @@ module.exports = class BonoCompiler {
       exported = require(file);
     } catch (err) {
       ctx.esnext = true;
-      return;
+      return false;
     }
 
     const exportedType = typeof exported;

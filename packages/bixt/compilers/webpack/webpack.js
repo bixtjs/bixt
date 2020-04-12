@@ -232,10 +232,11 @@ module.exports = class WebpackCompiler {
       },
     };
 
-    try {
-      return require(path.join(ctx.workDir, 'webpack.config.js'))(baseConfig, ctx);
-    } catch (err) {
-      return baseConfig;
+    const wrap = ctx.config.webpackConfig;
+    if (wrap) {
+      return wrap(baseConfig, ctx);
     }
+
+    return baseConfig;
   }
 };

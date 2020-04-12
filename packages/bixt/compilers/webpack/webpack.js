@@ -110,6 +110,11 @@ module.exports = class WebpackCompiler {
       return true;
     }
 
+    if (ctx.uri === '/_notfound') {
+      ctx.webpackCustomNotFound = ctx.file;
+      return true;
+    }
+
     const { file, uri } = ctx;
     const name = 'x' + file.split(ctx.workDir).pop().replace(/[./\\{}]/g, '-');
     const route = new Route(uri);
@@ -147,6 +152,7 @@ module.exports = class WebpackCompiler {
       },
       output: {
         path: `${wwwDir}`,
+        publicPath: '/',
       },
       devtool: 'sourcemap',
       module: {

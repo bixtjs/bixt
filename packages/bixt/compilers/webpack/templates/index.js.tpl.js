@@ -1,17 +1,21 @@
 const path = require('path');
 const fs = require('fs-extra');
 
-module.exports = async ({ webpackPages, config, workDir, webpackCustomApp }) => {
+module.exports = async ({ webpackPages, config, workDir, webpackCustomApp, webpackCustomNotFound }) => {
   const middlewares = config.middlewares.map(mw => {
     return path.join(workDir, mw);
   });
 
   const isCustomAppExists = await fs.exists(webpackCustomApp);
+  const isCustomNotFoundExists = await fs.exists(webpackCustomNotFound);
 
   return `
   import { app } from 'bixt/app';
   import { router } from 'bixt/router';
   ${isCustomAppExists ? `import App from '${webpackCustomApp}';` : ''}
+  import NotFoundView from '${isCustomNotFoundExists ? webpackCustomNotFound : 'bixt/notfound'}';
+
+  customElements.define('bixt-notfound-view', NotFoundView);
 
   customElements.define('bixt-router', router({
     loaders: [
@@ -32,6 +36,10 @@ module.exports = async ({ webpackPages, config, workDir, webpackCustomApp }) => 
     ],
     routes: [
       ${webpackPages.map(({ name, uri }) => JSON.stringify({ uri, view: name })).join(',')},
+      {
+        uri: '*',
+        view: 'bixt-notfound-view',
+      },
     ],
   }));
 

@@ -1,6 +1,6 @@
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+// const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const fs = require('fs-extra');
@@ -148,14 +148,15 @@ module.exports = class WebpackCompiler {
           {
             test: /\.p?css$/,
             use: [
-              {
-                loader: require.resolve('file-loader'),
-                options: {
-                  name: '[hash].css',
-                },
-              },
-              require.resolve('extract-loader'),
+              // {
+              //   loader: require.resolve('file-loader'),
+              //   options: {
+              //     name: '[hash].css',
+              //   },
+              // },
+              // require.resolve('extract-loader'),
               // MiniCssExtractPlugin.loader,
+              require.resolve('style-loader'),
               {
                 loader: require.resolve('css-loader'),
                 options: { importLoaders: 1 },

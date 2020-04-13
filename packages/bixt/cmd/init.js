@@ -12,9 +12,27 @@ module.exports = async function init (_, { workDir }) {
 
   await initApp({ workDir });
   await initDeps({ workDir });
+  await initFiles({ workDir });
   await initGit({ workDir });
   await showInfo({ workDir });
 };
+
+async function initFiles ({ workDir }) {
+  await fs.ensureDir(path.join(workDir, 'pages'));
+  await fs.writeFile(path.join(workDir, 'pages/index.js'), `
+import { LitElement, html } from 'lit-element';
+import { shady } from 'bixt/shady';
+
+export default class Home extends shady(LitElement) {
+  render () {
+    return html\`
+      <h1>Hello</h1>
+      <p>Welcome to Bixt</p>
+    \`;
+  }
+}
+  `.trim());
+}
 
 async function showInfo ({ workDir }) {
   logInfo(`Success initialize project at ${workDir}`);

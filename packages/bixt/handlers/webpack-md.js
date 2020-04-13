@@ -1,10 +1,10 @@
 const Route = require('bono/route');
 
 module.exports = function () {
-  return function webpackPage (ctx) {
+  return function webpackMd (ctx) {
     const { chunk } = ctx;
 
-    if (chunk.ext !== '.js' && !chunk.jsExported) {
+    if (chunk.ext !== '.md') {
       return;
     }
 
@@ -14,7 +14,11 @@ module.exports = function () {
     const loader = `
 {
   test: view => view === '${name}',
-  load: async view => customElements.define(view, (await import('${file}')).default),
+  load: async view => {
+    const html = (await import('bixt/html')).html;
+    const content = (await import('${file}')).default;
+    customElements.define(view, html(content));
+  },
 }
     `.trim();
     ctx.webpackPages.push({ name, uri, loader, route });

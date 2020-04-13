@@ -8,28 +8,20 @@ module.exports = async ({ webpackPages, config, workDir, webpackCustomApp, webpa
 
   const isCustomAppExists = await fs.exists(webpackCustomApp);
   const isCustomNotFoundExists = await fs.exists(webpackCustomNotFound);
+  const notFoundElement = isCustomNotFoundExists ? webpackCustomNotFound : 'bixt/notfound';
 
   return `
   import { app } from 'bixt/app';
   import { router } from 'bixt/router';
   ${isCustomAppExists ? `import App from '${webpackCustomApp}';` : ''}
-  import NotFoundView from '${isCustomNotFoundExists ? webpackCustomNotFound : 'bixt/notfound'}';
-
-  customElements.define('bixt-notfound-view', NotFoundView);
 
   customElements.define('bixt-router', router({
     loaders: [
-      ${webpackPages.map(({ name, file }) => `
-        {
-          test (view) { return view === '${name}'; },
-          async load (uri) {
-            const module = await import('${file}');
-            if (!customElements.get('${name}')) {
-              customElements.define('${name}', module.default);
-            }
-          },
-        }
-      `.trim()).join(',\n')},
+      ${webpackPages.map(({ loader }) => loader).join(',\n')},
+      {
+        test: view => view === 'bixt-notfound-view',
+        load: async view => customElements.define('bixt-notfound-view', (await import('${notFoundElement}')).default),
+      },
     ],
     middlewares: [
       ${middlewares.map(mw => `require('${mw}').default`).join(',\n')}
@@ -43,7 +35,6 @@ module.exports = async ({ webpackPages, config, workDir, webpackCustomApp, webpa
     ],
   }));
 
-  const BixtApp = app(${isCustomAppExists ? 'App' : ''});
-  customElements.define('bixt-app', BixtApp);
+  customElements.define('bixt-app', app(${isCustomAppExists ? 'App' : ''}));
   `.trim();
 };

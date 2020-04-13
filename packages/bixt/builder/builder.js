@@ -22,6 +22,8 @@ class Builder {
       require('../handlers/custom-notfound')(),
       require('../handlers/bono')(),
       require('../handlers/webpack-page')(),
+      require('../handlers/webpack-html')(),
+      require('../handlers/webpack-md')(),
     ],
   }) {
     this.workDir = path.resolve(workDir);

@@ -151,6 +151,13 @@ module.exports = class WebpackCompiler {
             use: require.resolve('html-loader'),
           },
           {
+            test: /\.md?$/i,
+            use: [
+              require.resolve('html-loader'),
+              require.resolve('markdown-loader'),
+            ],
+          },
+          {
             test: /\.(svg|png|ico|jpe?g|gif)(\?.*)?$/i,
             use: {
               loader: require.resolve('url-loader'),

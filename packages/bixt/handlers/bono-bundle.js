@@ -1,5 +1,5 @@
 module.exports = function () {
-  return function bono ({ chunk: { jsExported, uri }, bundler, router }) {
+  return function bonoBundle ({ chunk: { jsExported, uri }, bonoCtx: { bundler } }) {
     if (!jsExported) {
       return;
     }
@@ -13,12 +13,6 @@ module.exports = function () {
     if (firstLine.match(/class/)) {
       const ExportedBundle = jsExported;
       bundler.set(uri, new ExportedBundle());
-      return true;
-    }
-
-    if (firstLine.match(/=>|function/)) {
-      const methods = jsExported.methods || ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'];
-      router.route(methods, uri, jsExported);
       return true;
     }
   };

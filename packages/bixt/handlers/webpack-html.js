@@ -1,15 +1,13 @@
 const Route = require('bono/route');
 
 module.exports = function () {
-  return function webpackHtml (ctx) {
-    const { chunk } = ctx;
-
+  return function webpackHtml ({ chunk, webpackCtx }) {
     if (chunk.ext !== '.html') {
       return;
     }
 
     const { file, uri } = chunk;
-    const name = `bixt-${ctx.webpackPages.length}-view`;
+    const name = `bixt-${webpackCtx.pages.length}-view`;
     const route = new Route(uri);
     const loader = `
 {
@@ -21,7 +19,7 @@ module.exports = function () {
   },
 }
     `.trim();
-    ctx.webpackPages.push({ name, uri, loader, route });
+    webpackCtx.pages.push({ name, uri, loader, route });
     return true;
   };
 };

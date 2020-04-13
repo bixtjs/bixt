@@ -1,9 +1,7 @@
 module.exports = function () {
-  return function customApp (ctx) {
-    const { chunk } = ctx;
-
+  return function customApp ({ chunk, webpackCtx }) {
     if (chunk.ext === '.js' && chunk.uri === '/_app') {
-      ctx.webpackCustomApp = chunk.file;
+      webpackCtx.customAppFile = chunk.file;
       return true;
     }
   };

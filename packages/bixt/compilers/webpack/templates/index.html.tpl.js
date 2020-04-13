@@ -1,4 +1,4 @@
-module.exports = (ctx) => {
+module.exports = () => {
   return `
 <!DOCTYPE html>
 <html>
@@ -8,7 +8,7 @@ module.exports = (ctx) => {
   <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
-  <bixt-app></bixt-app>
+  <bixt-app id="app"></bixt-app>
 </body>
 </html>
   `.trim();

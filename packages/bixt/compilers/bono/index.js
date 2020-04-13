@@ -1,1 +1,1 @@
-module.exports = require('./bono');
+module.exports = require('./compiler');

@@ -7,20 +7,23 @@ const BonoCompiler = require('../compilers/bono');
 const logInfo = require('../logger')('bixt:builder:builder');
 const colors = require('colors');
 
+const BUILD_DELAY = 100;
+
 class Builder {
   constructor ({
     workDir = process.cwd(),
     server,
     compilers = [
       new BonoCompiler({ server }),
-      new WebpackCompiler({ server }),
+      new WebpackCompiler(),
     ],
     handlers = [
       require('../handlers/detect')(),
       require('../handlers/custom-index')(),
       require('../handlers/custom-app')(),
       require('../handlers/custom-notfound')(),
-      require('../handlers/bono')(),
+      require('../handlers/bono-bundle')(),
+      require('../handlers/bono-route')(),
       require('../handlers/webpack-page')(),
       require('../handlers/webpack-html')(),
       require('../handlers/webpack-md')(),
@@ -65,7 +68,7 @@ class Builder {
               resolve();
             }
           }
-        }, 300);
+        }, BUILD_DELAY);
       };
 
       ['add', 'change', 'unlink'].forEach(eventName => {

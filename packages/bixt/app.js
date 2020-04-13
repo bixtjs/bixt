@@ -6,14 +6,20 @@ export function app (Element) {
     Element = class extends shady(LitElement) {
       render () {
         return html`
-          <bixt-router></bixt-router>
+          <></bixt-router>
         `;
       }
     };
   }
 
   class App extends Element {
+    get router () {
+      if (!this.router) {
+        this.router = document.querySelector('bixt-router');
+      }
 
+      return this.router;
+    }
   }
 
   return App;

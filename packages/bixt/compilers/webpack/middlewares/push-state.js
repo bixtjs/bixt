@@ -1,6 +1,6 @@
 const send = require('koa-send');
 
-module.exports = function ({ webpackPages, webpackWwwDir }) {
+module.exports = function ({ pages, wwwDir }) {
   return async (ctx, next) => {
     await next();
 
@@ -12,11 +12,10 @@ module.exports = function ({ webpackPages, webpackWwwDir }) {
       return;
     }
 
-    const sendOptions = { root: webpackWwwDir };
+    const sendOptions = { root: wwwDir };
 
-    const found = webpackPages.find(page => page.route.match(ctx));
+    const found = pages.find(page => page.route.match(ctx));
     if (found) {
-      // ctx.originalPath = ctx.path;
       ctx.path = '/';
     }
 

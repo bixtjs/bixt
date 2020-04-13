@@ -1,23 +1,22 @@
-const path = require('path');
 const fs = require('fs-extra');
 
-module.exports = async ({ webpackPages, config, workDir, webpackCustomApp, webpackCustomNotFound }) => {
-  const middlewares = config.middlewares.map(mw => {
-    return path.join(workDir, mw);
-  });
+module.exports = async (ctx) => {
+  const { pages, middlewares, customAppFile, customNotFoundFile } = ctx;
+  const [isCustomAppExists, isCustomNotFoundExists] = await Promise.all([
+    fs.exists(customAppFile),
+    fs.exists(customNotFoundFile),
+  ]);
 
-  const isCustomAppExists = await fs.exists(webpackCustomApp);
-  const isCustomNotFoundExists = await fs.exists(webpackCustomNotFound);
-  const notFoundElement = isCustomNotFoundExists ? webpackCustomNotFound : 'bixt/notfound';
+  const notFoundElement = isCustomNotFoundExists ? customNotFoundFile : 'bixt/notfound';
 
   return `
   import { app } from 'bixt/app';
   import { router } from 'bixt/router';
-  ${isCustomAppExists ? `import App from '${webpackCustomApp}';` : ''}
+  ${isCustomAppExists ? `import App from '${customAppFile}';` : ''}
 
   customElements.define('bixt-router', router({
     loaders: [
-      ${webpackPages.map(({ loader }) => loader).join(',\n')},
+      ${pages.map(({ loader }) => loader).join(',\n')},
       {
         test: view => view === 'bixt-notfound-view',
         load: async view => customElements.define('bixt-notfound-view', (await import('${notFoundElement}')).default),
@@ -27,7 +26,7 @@ module.exports = async ({ webpackPages, config, workDir, webpackCustomApp, webpa
       ${middlewares.map(mw => `require('${mw}').default`).join(',\n')}
     ],
     routes: [
-      ${webpackPages.map(({ name, uri }) => JSON.stringify({ uri, view: name })).join(',\n')},
+      ${pages.map(({ name, uri }) => JSON.stringify({ uri, view: name })).join(',\n')},
       {
         uri: '*',
         view: 'bixt-notfound-view',

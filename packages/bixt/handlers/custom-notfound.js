@@ -1,9 +1,7 @@
 module.exports = function () {
-  return function customNotFound (ctx) {
-    const { chunk } = ctx;
-
+  return function customNotFound ({ chunk, webpackCtx }) {
     if (chunk.ext === '.js' && chunk.uri === '/_notfound') {
-      ctx.webpackCustomNotFound = chunk.file;
+      webpackCtx.customNotFoundFile = chunk.file;
       return true;
     }
   };

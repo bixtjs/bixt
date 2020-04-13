@@ -40,6 +40,7 @@ function parseCommand (argv) {
     workDir,
     ...argv,
   };
+
   delete opts._;
 
   return [require(`../cmd/${cmd || DEFAULT_COMMAND}`), args, opts];

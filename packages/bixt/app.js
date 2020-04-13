@@ -6,7 +6,7 @@ export function app (Element) {
     Element = class extends shady(LitElement) {
       render () {
         return html`
-          <></bixt-router>
+          <bixt-router></bixt-router>
         `;
       }
     };

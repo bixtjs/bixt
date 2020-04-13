@@ -19,6 +19,10 @@ module.exports = class BonoCompiler {
       ],
     };
 
+    if (!this.server) {
+      return next();
+    }
+
     for (const id in require.cache) {
       if (id.startsWith(ctx.workDir)) {
         delete require.cache[id];

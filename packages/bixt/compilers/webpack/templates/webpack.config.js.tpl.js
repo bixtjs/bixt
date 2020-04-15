@@ -22,7 +22,7 @@ module.exports = (_, { mode = 'development' }) => {
     module: {
       rules: [
         {
-          test: /\\.p?css$/,
+          test: /\\.p?css$/i,
           use: [
             // 'style-loader',
             MiniCssExtractPlugin.loader,
@@ -49,13 +49,23 @@ module.exports = (_, { mode = 'development' }) => {
           ],
         },
         {
-          test: /\\.html?$/i,
-          use: 'html-loader',
+          test: /\\.html$/i,
+          use: {
+            loader: 'url-loader',
+            options: {
+              limit: ${FILE_LIMIT},
+            },
+          },
         },
         {
-          test: /\\.md?$/i,
+          test: /\\.md$/i,
           use: [
-            'html-loader',
+            {
+              loader: 'url-loader',
+              options: {
+                limit: ${FILE_LIMIT},
+              }
+            },
             'markdown-loader',
           ],
         },
@@ -81,7 +91,7 @@ module.exports = (_, { mode = 'development' }) => {
     },
     plugins: [
       new HtmlWebpackPlugin({
-        template: '${path.join(srcDir, 'index.html')}',
+        template: '!!html-loader!${path.join(srcDir, 'index.html')}',
       }),
       // new FaviconsWebpackPlugin({
       //   logo: './src/assets/logo.png',

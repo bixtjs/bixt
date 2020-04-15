@@ -1,13 +1,12 @@
 const fs = require('fs-extra');
 
-module.exports = async (ctx) => {
-  const { pages, middlewares, customAppFile, customNotFoundFile } = ctx;
+module.exports = async ({ pages, staticPages, middlewares, customAppFile, customNotFoundFile }) => {
   const [isCustomAppExists, isCustomNotFoundExists] = await Promise.all([
     fs.exists(customAppFile),
     fs.exists(customNotFoundFile),
   ]);
 
-  const notFoundElement = isCustomNotFoundExists ? customNotFoundFile : 'bixt/notfound';
+  const notFoundElement = isCustomNotFoundExists ? customNotFoundFile : 'bixt/components/notfound';
 
   return `
   import { app } from 'bixt/app';
@@ -18,6 +17,10 @@ module.exports = async (ctx) => {
     loaders: [
       ${pages.map(({ loader }) => loader).join(',\n')},
       {
+        test: view => view === 'bixt-html-view',
+        load: async view => customElements.define('bixt-html-view', (await import('bixt/components/html')).default)
+      },
+      {
         test: view => view === 'bixt-notfound-view',
         load: async view => customElements.define('bixt-notfound-view', (await import('${notFoundElement}')).default),
       },
@@ -26,11 +29,13 @@ module.exports = async (ctx) => {
       ${middlewares.map(mw => `require('${mw}').default`).join(',\n')}
     ],
     routes: [
-      ${pages.map(({ name, uri }) => JSON.stringify({ uri, view: name })).join(',\n')},
-      {
-        uri: '*',
-        view: 'bixt-notfound-view',
-      },
+      ${pages.map(({ name, uri, props }) => JSON.stringify({ uri, view: name, props })).join(',\n')},
+      ${staticPages.map(({ uri, file }) => `{
+        uri: '${uri}',
+        view: 'bixt-html-view',
+        props: { file: require('${file}').default },
+      }`).join(',\n')},
+      { uri: '*', view: 'bixt-notfound-view' },
     ],
   }));
 

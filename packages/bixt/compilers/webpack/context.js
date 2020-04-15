@@ -21,6 +21,7 @@ module.exports = class WebpackContext {
     this.middlewares = (config.middlewares || []).map(mw => path.join(workDir, mw));
 
     this.pages = [];
+    this.staticPages = [];
 
     fs.ensureDirSync(this.srcDir);
   }

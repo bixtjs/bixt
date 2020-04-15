@@ -7,6 +7,8 @@ export default class Foo extends LitElement {
         <a href="/">Home</a>
         <a href="/foo">Foo</a>
         <a href="/bar">Bar</a>
+        <a href="/about-us">About Us</a>
+        <a href="/disclaimer">Disclaimer</a>
       </div>
       <div>
         [foo]

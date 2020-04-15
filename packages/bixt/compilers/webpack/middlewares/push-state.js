@@ -1,6 +1,6 @@
 const send = require('koa-send');
 
-module.exports = function ({ pages, wwwDir }) {
+module.exports = function ({ pages, staticPages, wwwDir }) {
   return async (ctx, next) => {
     await next();
 
@@ -14,7 +14,10 @@ module.exports = function ({ pages, wwwDir }) {
 
     const sendOptions = { root: wwwDir };
 
-    const found = pages.find(page => page.route.match(ctx));
+    let found = pages.find(page => page.route.match(ctx));
+    if (!found) {
+      found = staticPages.find(page => page.route.match(ctx));
+    }
     if (found) {
       ctx.path = '/';
     }

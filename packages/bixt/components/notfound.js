@@ -1,6 +1,6 @@
 import { LitElement, html } from 'lit-element';
 
-export default class NotFound extends LitElement {
+export default class NotFoundView extends LitElement {
   render () {
     return html`
       NOTFOUND!!!

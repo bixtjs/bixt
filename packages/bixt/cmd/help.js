@@ -6,7 +6,6 @@ Usage:
   bixt [<command>] [options]
 
 Commands:
-  init               initialize new project
   dev                start development (default)
   build              build static files
   start              start production server

@@ -9,6 +9,21 @@
   "bin": {
     "bixt": "./bin/bixt.js"
   },
+  "files": [
+    "bin",
+    "builder",
+    "cmd",
+    "compilers",
+    "handlers",
+    "lib",
+    "server",
+    "app.js",
+    "html.js",
+    "logger.js",
+    "notfound.js",
+    "router.js",
+    "shady.js"
+  ],
   "scripts": {
     "dev": "DEBUG_COLORS=1 DEBUG=bixt* nodemon ./bin/bixt.js --work-dir ../example",
     "test": "mocha --recursive"
@@ -35,10 +50,8 @@
     "postcss-loader": "^3.0.0",
     "postcss-preset-env": "^6.7.0",
     "postcss-url": "^8.0.0",
-    "prompts": "^2.3.2",
     "terser-webpack-plugin": "^2.3.5",
     "url-loader": "^4.1.0",
-    "validate-npm-package-name": "^3.0.0",
     "webpack": "^4.42.1"
   },
   "devDependencies": {

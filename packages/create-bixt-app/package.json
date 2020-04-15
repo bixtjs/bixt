@@ -1,0 +1,31 @@
+{
+  "name": "create-bixt-app",
+  "version": "0.1.15",
+  "description": "Create bixt app",
+  "author": "Ganesha <reekoheek@gmail.com>",
+  "homepage": "https://github.com/bixtjs/bixt#readme",
+  "license": "MIT",
+  "main": "index.js",
+  "bin": {
+    "create-bixt-app": "./index.js"
+  },
+  "files": [
+    "index.js"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bixtjs/bixt.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  },
+  "bugs": {
+    "url": "https://github.com/bixtjs/bixt/issues"
+  },
+  "dependencies": {
+    "colors": "^1.4.0",
+    "fs-extra": "^9.0.0",
+    "prompts": "^2.3.2",
+    "validate-npm-package-name": "^3.0.0"
+  }
+}

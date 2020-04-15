@@ -1,11 +1,9 @@
 # `bixt`
 
-> TODO: description
+Create backend and frontend app quickly
 
 ## Usage
 
-```
-const bixt = require('bixt');
-
-// TODO: DEMONSTRATE API
+```sh
+npm init bixt-app
 ```

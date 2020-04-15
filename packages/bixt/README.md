@@ -1,4 +1,4 @@
-# `bixt`
+# bixt
 
 Create backend and frontend app quickly
 

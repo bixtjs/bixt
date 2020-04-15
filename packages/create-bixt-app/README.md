@@ -1,4 +1,4 @@
-# `create-bixt-app`
+# create-bixt-app
 
 > Create bixt app
 

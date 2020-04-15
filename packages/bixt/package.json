@@ -3,7 +3,7 @@
   "version": "0.1.16",
   "description": "Progressive Bono Lit Framework",
   "author": "Ganesha <reekoheek@gmail.com>",
-  "homepage": "",
+  "homepage": "https://github.com/bixtjs/bixt#readme",
   "license": "MIT",
   "main": "index.js",
   "bin": {
@@ -24,9 +24,16 @@
     "router.js",
     "shady.js"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bixtjs/bixt.git"
+  },
   "scripts": {
     "dev": "DEBUG_COLORS=1 DEBUG=bixt* nodemon ./bin/bixt.js --work-dir ../example",
     "test": "mocha --recursive"
+  },
+  "bugs": {
+    "url": "https://github.com/bixtjs/bixt/issues"
   },
   "dependencies": {
     "bono": "^1.1.0",

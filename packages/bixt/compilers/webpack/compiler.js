@@ -28,7 +28,6 @@ module.exports = class WebpackCompiler {
       await this.packer[ctx.mode === 'development' ? 'watch' : 'run'](webpackCtx);
     }
 
-    ctx.bonoCtx.middlewares.push(require('koa-static')(webpackCtx.wwwDir, { defer: true }));
     ctx.bonoCtx.middlewares.push(require('./middlewares/push-state')(webpackCtx));
   }
 };

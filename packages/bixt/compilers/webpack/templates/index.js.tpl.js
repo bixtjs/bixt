@@ -30,10 +30,10 @@ module.exports = async ({ pages, staticPages, middlewares, customAppFile, custom
     ],
     routes: [
       ${pages.map(({ name, uri, props }) => JSON.stringify({ uri, view: name, props })).join(',\n')},
-      ${staticPages.map(({ uri, file }) => `{
+      ${staticPages.map(({ uri, loader, file }) => `{
         uri: '${uri}',
         view: 'bixt-html-view',
-        props: { file: require('${file}').default },
+        props: { file: require('${loader}!${file}').default },
       }`).join(',\n')},
       { uri: '*', view: 'bixt-notfound-view' },
     ],

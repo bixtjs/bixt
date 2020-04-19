@@ -49,27 +49,6 @@ module.exports = (_, { mode = 'development' }) => {
           ],
         },
         {
-          test: /\\.html$/i,
-          use: {
-            loader: 'url-loader',
-            options: {
-              limit: ${FILE_LIMIT},
-            },
-          },
-        },
-        {
-          test: /\\.md$/i,
-          use: [
-            {
-              loader: 'url-loader',
-              options: {
-                limit: ${FILE_LIMIT},
-              }
-            },
-            'markdown-loader',
-          ],
-        },
-        {
           test: /\\.(svg|png|ico|jpe?g|gif)(\\?.*)?$/i,
           use: {
             loader: 'url-loader',
@@ -101,8 +80,8 @@ module.exports = (_, { mode = 'development' }) => {
     optimization: {
       minimize: mode === 'production',
       minimizer: [
-        new TerserPlugin({}),
-        new OptimizeCSSAssetsPlugin({}),
+        new TerserPlugin(),
+        new OptimizeCSSAssetsPlugin(),
       ],
     },
   };

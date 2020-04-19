@@ -8,8 +8,8 @@ module.exports = function () {
 
     const { file, uri } = chunk;
     const route = new Route(uri);
-
-    webpackCtx.staticPages.push({ uri, file, route });
+    const loader = '!!url-loader!markdown-loader';
+    webpackCtx.staticPages.push({ uri, file, loader, route });
 
     return true;
   };

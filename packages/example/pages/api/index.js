@@ -1,6 +1,7 @@
 module.exports = ctx => {
+  const pkg = require('../../package.json');
   return {
-    name: 'api',
-    timestamp: new Date(),
+    name: pkg.name,
+    version: pkg.version,
   };
 };

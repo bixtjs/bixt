@@ -24,10 +24,17 @@ module.exports = class WebpackCompiler {
     this.writer.write(webpackCtx, 'index.js');
     this.writer.write(webpackCtx, 'index.html', webpackCtx.customIndexFile);
 
-    if (!this.packer.running) {
-      await this.packer[ctx.mode === 'development' ? 'watch' : 'run'](webpackCtx);
+    if (ctx.mode === 'development') {
+      if (!this.packer.running) {
+        await this.packer.watch(webpackCtx);
+      }
+    } else {
+      await this.packer.run(webpackCtx);
     }
 
+    if (this.packer.hotMiddleware) {
+      ctx.bonoCtx.middlewares.push(this.packer.hotMiddleware);
+    }
     ctx.bonoCtx.middlewares.push(require('./middlewares/push-state')(webpackCtx));
   }
 };

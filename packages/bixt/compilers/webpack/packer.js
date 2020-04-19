@@ -7,7 +7,7 @@ module.exports = class Packer {
     logInfo('Webpack building ...');
 
     const config = await this.getConfig(ctx);
-    const compiler = webpack(config);
+    const compiler = this.compiler = webpack(config);
 
     await new Promise((resolve, reject) => {
       compiler.run((err, stats) => {
@@ -34,7 +34,19 @@ module.exports = class Packer {
     logInfo('Webpack watching ...');
 
     const config = await this.getConfig(ctx);
-    const compiler = webpack(config);
+    const compiler = this.compiler = webpack(config);
+
+    const action = require('webpack-hot-middleware')(compiler);
+    this.hotMiddleware = (ctx, next) => {
+      const result = action(ctx.req, ctx.res, () => true);
+      if (result) {
+        return next();
+      }
+
+      ctx.status = 200;
+      ctx.respond = false;
+      // ctx.body = ctx.res;
+    };
 
     await new Promise((resolve, reject) => {
       compiler.watch({}, (err, stats) => {

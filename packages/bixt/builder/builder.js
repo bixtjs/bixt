@@ -7,7 +7,7 @@ const BonoCompiler = require('../compilers/bono');
 const logInfo = require('../logger')('bixt:builder:builder');
 const colors = require('colors');
 
-const BUILD_DELAY = 100;
+const BUILD_DELAY = 300;
 
 class Builder {
   constructor ({

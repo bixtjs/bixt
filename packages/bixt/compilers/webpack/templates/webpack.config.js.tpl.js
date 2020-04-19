@@ -3,6 +3,7 @@ const FILE_LIMIT = 48;
 
 module.exports = ({ srcDir, wwwDir }) => {
   const content = `
+const webpack = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
@@ -12,7 +13,14 @@ module.exports = (_, { mode = 'development' }) => {
   return {
     mode,
     entry: {
-      index: '${path.join(srcDir, 'index.js')}',
+      index: [
+        '${path.join(srcDir, 'index.js')}',
+        ...(
+          mode === 'development'
+            ? ['webpack-hot-middleware/client?path=/__webpack_hmr&timeout=20000&reload=true']
+            : []
+        ),
+      ],
     },
     output: {
       path: '${wwwDir}',
@@ -76,6 +84,7 @@ module.exports = (_, { mode = 'development' }) => {
       //   logo: './src/assets/logo.png',
       // }),
       new MiniCssExtractPlugin(),
+      ...(mode === 'development' ? [new webpack.HotModuleReplacementPlugin()] : []),
     ],
     optimization: {
       minimize: mode === 'production',

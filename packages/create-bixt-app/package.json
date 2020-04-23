@@ -10,6 +10,7 @@
     "create-bixt-app": "./index.js"
   },
   "files": [
+    "templates",
     "lib",
     "index.js"
   ],

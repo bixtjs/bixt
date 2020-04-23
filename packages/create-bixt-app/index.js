@@ -37,6 +37,7 @@ Usage:
   npm init bixt-app [dir]
   npx create-bixt-app [dir]
     `.trim());
+    console.error(colors.red('Error caught,'), err);
   }
 })();
 

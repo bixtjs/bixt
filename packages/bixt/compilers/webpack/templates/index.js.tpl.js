@@ -13,6 +13,8 @@ module.exports = async ({ pages, staticPages, middlewares, customAppFile, custom
   import { defineRouter } from 'bixt/router';
   ${isCustomAppExists ? `import App from '${customAppFile}';` : ''}
 
+  import 'bixt/link';
+
   defineRouter({
     loaders: [
       ${pages.map(({ loader }) => loader).join(',\n')},

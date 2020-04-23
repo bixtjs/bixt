@@ -1,6 +1,8 @@
 import { Router } from 'litx-router/router';
 import { app } from './app';
 
+const kClickHandler = Symbol('handler');
+
 export function router () {
   return app().router;
 }
@@ -19,3 +21,21 @@ export function defineRouter ({ loaders, middlewares, routes }) {
 
   customElements.define('bixt-router', BixtRouter);
 }
+
+class BixtLink extends HTMLElement {
+  connectedCallback () {
+    this[kClickHandler] = evt => {
+      evt.preventDefault();
+      const uri = evt.target.closest('a').getAttribute('href');
+      router().push(uri);
+    };
+
+    this.addEventListener('click', this[kClickHandler]);
+  }
+
+  disconnectedCallback () {
+    this.removeEventListener('click', this[kClickHandler]);
+  }
+}
+
+customElements.define('bixt-link', BixtLink);

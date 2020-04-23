@@ -58,7 +58,7 @@
     "postcss-url": "^8.0.0",
     "terser-webpack-plugin": "^2.3.5",
     "url-loader": "^4.1.0",
-    "webpack": "^4.42.1",
+    "webpack": "^4.43.0",
     "webpack-hot-middleware": "^2.25.0"
   },
   "devDependencies": {

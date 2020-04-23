@@ -23,6 +23,6 @@
     "postcss-preset-env": "^6.7.0",
     "postcss-url": "^8.0.0",
     "url-loader": "^4.1.0",
-    "webpack": "^4.42.1"
+    "webpack": "^4.43.0"
   }
 }

@@ -19,6 +19,8 @@
     "lib",
     "server",
     "app.js",
+    "index.js",
+    "link.js",
     "logger.js",
     "router.js",
     "shady.js"

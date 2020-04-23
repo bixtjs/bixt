@@ -1,7 +1,12 @@
 import { Router } from 'litx-router/router';
+import { app } from './app';
 
-export function router ({ loaders, middlewares, routes }) {
-  return class BixtRouter extends Router {
+export function router () {
+  return app().router;
+}
+
+export function defineRouter ({ loaders, middlewares, routes }) {
+  class BixtRouter extends Router {
     connectedCallback () {
       this.mode = 'history';
       this.loaders = loaders;
@@ -10,5 +15,7 @@ export function router ({ loaders, middlewares, routes }) {
 
       super.connectedCallback();
     }
-  };
+  }
+
+  customElements.define('bixt-router', BixtRouter);
 }

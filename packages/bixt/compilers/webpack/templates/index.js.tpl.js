@@ -9,11 +9,11 @@ module.exports = async ({ pages, staticPages, middlewares, customAppFile, custom
   const notFoundElement = isCustomNotFoundExists ? customNotFoundFile : 'bixt/components/notfound';
 
   return `
-  import { app } from 'bixt/app';
-  import { router } from 'bixt/router';
+  import { defineApp } from 'bixt/app';
+  import { defineRouter } from 'bixt/router';
   ${isCustomAppExists ? `import App from '${customAppFile}';` : ''}
 
-  customElements.define('bixt-router', router({
+  defineRouter({
     loaders: [
       ${pages.map(({ loader }) => loader).join(',\n')},
       {
@@ -37,8 +37,8 @@ module.exports = async ({ pages, staticPages, middlewares, customAppFile, custom
       }`).join(',\n')},
       { uri: '*', view: 'bixt-notfound-view' },
     ],
-  }));
+  });
 
-  customElements.define('bixt-app', app(${isCustomAppExists ? 'App' : ''}));
+  defineApp(${isCustomAppExists ? 'App' : ''});
   `.trim();
 };

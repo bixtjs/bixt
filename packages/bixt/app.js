@@ -1,7 +1,23 @@
 import { LitElement, html } from 'lit-element';
 import { shady } from './shady';
 
-export function app (Element) {
+const kRouter = Symbol('router');
+
+let instance;
+
+export function app () {
+  if (!instance) {
+    instance = document.querySelector('bixt-app');
+  }
+
+  return instance;
+}
+
+export function defineApp (Element) {
+  if (customElements.get('bixt-app')) {
+    throw new Error('App already defined');
+  }
+
   if (!Element) {
     Element = class extends shady(LitElement) {
       render () {
@@ -14,13 +30,13 @@ export function app (Element) {
 
   class App extends Element {
     get router () {
-      if (!this.router) {
-        this.router = document.querySelector('bixt-router');
+      if (!this[kRouter]) {
+        this[kRouter] = this.querySelector('bixt-router') || this.shadowRoow.querySelector('bixt-router');
       }
 
-      return this.router;
+      return this[kRouter];
     }
   }
 
-  return App;
+  customElements.define('bixt-app', App);
 }

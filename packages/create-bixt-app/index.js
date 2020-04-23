@@ -37,7 +37,8 @@ Usage:
   npm init bixt-app [dir]
   npx create-bixt-app [dir]
     `.trim());
-    console.error(colors.red('Error caught,'), err);
+    console.info('');
+    console.error(err.stack.split(/[\r\n]+/).map(x => `${colors.red('E|')} ${x}`).join('\n'));
   }
 })();
 
@@ -69,7 +70,6 @@ async function initGit ({ workDir }) {
     await fs.writeFile(gitignoreFile, GITIGNORES.join('\n'));
   }
 
-  console.info('');
   await spawn('git', ['init'], { cwd: workDir });
   console.info('');
 }
@@ -88,12 +88,11 @@ async function initDeps ({ workDir }) {
   await fs.writeFile(pjsFile, JSON.stringify(pjs, null, 2));
 
   console.info('');
-  console.info(`Installing ${DEPENDENCIES.map(d => colors.cyan(d)).join(', ')} ...`);
-
-  console.info('');
+  console.info(`Installing dependencies: ${DEPENDENCIES.map(d => colors.cyan(d)).join(', ')} ...`);
   await spawn('npm', ['install', ...DEPENDENCIES, '--save'], { cwd: workDir });
+
+  console.info(`Installing dev dependencies: ${DEV_DEPENDENCIES.map(d => colors.cyan(d)).join(', ')} ...`);
   await spawn('npm', ['install', ...DEV_DEPENDENCIES, '-D'], { cwd: workDir });
-  console.info('');
 }
 
 async function initApp ({ workDir }) {
@@ -124,8 +123,7 @@ async function initApp ({ workDir }) {
   workDir = path.resolve(workDir || name);
   const pjsFile = path.join(workDir, 'package.json');
   if (await fs.exists(pjsFile)) {
-    console.error('Project directory already initialized');
-    return;
+    throw new Error('Project directory already initialized');
   }
 
   const pjs = {

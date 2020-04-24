@@ -31,7 +31,7 @@ export function defineApp (Element) {
   class App extends Element {
     get router () {
       if (!this[kRouter]) {
-        this[kRouter] = this.querySelector('bixt-router') || this.shadowRoow.querySelector('bixt-router');
+        this[kRouter] = this.querySelector('bixt-router') || this.shadowRoot.querySelector('bixt-router');
       }
 
       return this[kRouter];

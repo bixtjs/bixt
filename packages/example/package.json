@@ -1,6 +1,6 @@
 {
   "name": "example",
-  "version": "0.1.31",
+  "version": "0.1.32",
   "description": "> TODO: description",
   "author": "Ganesha <reekoheek@gmail.com>",
   "homepage": "",
@@ -15,7 +15,7 @@
     "test": "echo \"Error: run tests from root\" && exit 1"
   },
   "dependencies": {
-    "bixt": "^0.1.31",
+    "bixt": "^0.1.32",
     "bono": "^1.1.0",
     "html-loader": "^1.1.0",
     "html-webpack-plugin": "^4.2.0",

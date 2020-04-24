@@ -1,6 +1,6 @@
 const fs = require('fs-extra');
 
-module.exports = async ({ pages, staticPages, middlewares, customAppFile, customNotFoundFile }) => {
+module.exports = async ({ pages, staticPages, customAppFile, customNotFoundFile, config }) => {
   const [isCustomAppExists, isCustomNotFoundExists] = await Promise.all([
     fs.exists(customAppFile),
     fs.exists(customNotFoundFile),
@@ -28,7 +28,7 @@ module.exports = async ({ pages, staticPages, middlewares, customAppFile, custom
       },
     ],
     middlewares: [
-      ${middlewares.map(mw => `require('${mw}').default`).join(',\n')}
+      ${(config.middlewares || []).map(mw => `require('${mw}').default`).join(',\n')}
     ],
     routes: [
       ${pages.map(({ name, uri, props }) => JSON.stringify({ uri, view: name, props })).join(',\n')},

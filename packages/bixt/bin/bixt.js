@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+const configure = require('../configure');
 const CMD_HELP = require('../cmd/help');
 const DEFAULT_COMMAND = 'dev';
 const logError = require('../logger')('bixt:bin', 'error');
@@ -33,15 +34,7 @@ function parseCommand (argv) {
 
   const [cmd, ...args] = argv._;
 
-  const workDir = process.cwd();
-
-  const opts = {
-    port: process.env.PORT || 3000,
-    workDir,
-    ...argv,
-  };
-
-  delete opts._;
+  const opts = configure(argv);
 
   return [require(`../cmd/${cmd || DEFAULT_COMMAND}`), args, opts];
 }

@@ -1,9 +1,6 @@
 const { Server } = require('../server');
-const { Builder } = require('../builder');
 
-module.exports = async function start (args, opts) {
-  const server = new Server(opts);
-  const builder = new Builder({ ...opts, server });
-  await builder.build({ mode: 'production' });
+module.exports = async function start (_, config) {
+  const server = new Server(config);
   await server.listen();
 };

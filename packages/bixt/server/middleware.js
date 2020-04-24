@@ -1,6 +1,7 @@
 const send = require('koa-send');
+const Route = require('bono/route');
 
-module.exports = function ({ pages, staticPages, wwwDir }) {
+module.exports = function ({ webpackAssets, wwwDir }) {
   const sendOptions = { root: wwwDir, index: 'index.html' };
 
   return async (ctx, next) => {
@@ -31,10 +32,12 @@ module.exports = function ({ pages, staticPages, wwwDir }) {
       return;
     }
 
-    let found = pages.find(page => page.route.match(ctx));
-    if (!found) {
-      found = staticPages.find(page => page.route.match(ctx));
-    }
+    const found = webpackAssets.find(asset => {
+      if (!asset.route) {
+        asset.route = new Route(asset.uri);
+      }
+      return asset.route.match(ctx);
+    });
 
     ctx.path = '/';
 

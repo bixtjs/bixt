@@ -1,7 +1,7 @@
 const path = require('path');
 const FILE_LIMIT = 48;
 
-module.exports = ({ srcDir, wwwDir }) => {
+module.exports = ({ config: { srcDir, wwwDir } }) => {
   const content = `
 const webpack = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');

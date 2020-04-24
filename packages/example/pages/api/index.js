@@ -5,3 +5,5 @@ module.exports = ctx => {
     version: pkg.version,
   };
 };
+
+module.exports.methods = ['GET'];

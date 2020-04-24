@@ -1,7 +1,8 @@
 module.exports = function () {
-  return function customIndex ({ webpackCtx, chunk }) {
+  return function customIndex (ctx) {
+    const chunk = ctx.chunk;
     if (chunk.uri === '/_index' && chunk.ext === '.html') {
-      webpackCtx.customIndexFile = chunk.file;
+      ctx.customIndexFile = chunk.file;
       return true;
     }
   };

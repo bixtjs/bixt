@@ -5,21 +5,29 @@ const http = require('http');
 const path = require('path');
 // const https = require('https');
 
-const kServerHook = Symbol('serverHook');
 const logInfo = require('../logger')('bixt:server:server');
 
 const NOOP = () => undefined;
 const DEFAULT_METHODS = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'];
 
 class Server extends Bundle {
-  constructor ({ https = false, hostname = '127.0.0.1', port = 3000, srcDir, wwwDir, serverHook = NOOP } = {}) {
+  constructor ({
+    https = false,
+    hostname = '127.0.0.1',
+    port = 3000,
+    srcDir,
+    wwwDir,
+    attachServer = NOOP,
+    detachServer = NOOP,
+  } = {}) {
     super();
 
     this.hostname = hostname;
     this.port = port;
     this.https = https;
     this.wwwDir = wwwDir;
-    this[kServerHook] = serverHook;
+    this.attachServer = attachServer;
+    this.detachServer = detachServer;
 
     let config = {};
     try {
@@ -77,12 +85,12 @@ class Server extends Bundle {
       throw new Error('Unimplemented yet');
     }
 
-    const server = http.createServer(this.callback());
+    this._server = http.createServer(this.callback());
 
-    await this.attach(server);
+    await this.attach(this._server);
 
     await new Promise((resolve, reject) => {
-      server.listen(this.port, this.hostname, err => {
+      this._server.listen(this.port, this.hostname, err => {
         if (err) {
           return reject(err);
         }
@@ -94,8 +102,13 @@ class Server extends Bundle {
   }
 
   async attach (server) {
-    const hook = this[kServerHook];
-    await hook(server);
+    const attach = this.attachServer;
+    await attach(server);
+  }
+
+  async detach (server) {
+    const detach = this.detachServer;
+    await detach(server);
   }
 }
 

@@ -9,12 +9,15 @@ const logError = require('../logger')('bixt:bin', 'error');
     const argv = require('minimist')(process.argv.slice(2), {
       string: [
         'workDir',
+        'host',
+        'port',
       ],
       boolean: [
         'help',
       ],
       alias: {
         d: 'workDir',
+        p: 'port',
         'work-dir': 'workDir',
         h: 'help',
       },

@@ -13,7 +13,7 @@ const DEFAULT_METHODS = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'];
 class Server extends Bundle {
   constructor ({
     https = false,
-    hostname = '127.0.0.1',
+    host = '127.0.0.1',
     port = 3000,
     srcDir,
     wwwDir,
@@ -22,7 +22,7 @@ class Server extends Bundle {
   } = {}) {
     super();
 
-    this.hostname = hostname;
+    this.host = host;
     this.port = port;
     this.https = https;
     this.wwwDir = wwwDir;
@@ -90,12 +90,12 @@ class Server extends Bundle {
     await this.attach(this._server);
 
     await new Promise((resolve, reject) => {
-      this._server.listen(this.port, this.hostname, err => {
+      this._server.listen(this.port, this.host, err => {
         if (err) {
           return reject(err);
         }
 
-        logInfo(`Bixt Server listening at http${this.https ? 's' : ''}://${this.hostname}:${this.port}`);
+        logInfo(`Bixt Server listening at http${this.https ? 's' : ''}://${this.host}:${this.port}`);
         resolve();
       });
     });

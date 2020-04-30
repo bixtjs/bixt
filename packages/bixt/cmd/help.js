@@ -13,8 +13,11 @@ Commands:
 Options:
   -h, --help         print usage information
   -d, --work-dir     change working directory (default: cwd)
+  -p, --port         change port (default: 3000)
+      --host         change hostname (default: 127.0.0.1)
 
 Environment variables
   PORT               change port (default: 3000)
+  HOST               change host (default: 127.0.0.1)
   `);
 };

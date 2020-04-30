@@ -13,6 +13,7 @@ const logError = require('../logger')('bixt:bin', 'error');
         'port',
       ],
       boolean: [
+        'https',
         'help',
       ],
       alias: {

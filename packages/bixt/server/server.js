@@ -2,8 +2,8 @@ const Bundle = require('bono/bundle');
 const Router = require('bono/router');
 const Bundler = require('bono/bundler');
 const http = require('http');
+const https = require('https');
 const path = require('path');
-// const https = require('https');
 
 const logInfo = require('../logger')('bixt:server:server');
 
@@ -22,9 +22,9 @@ class Server extends Bundle {
   } = {}) {
     super();
 
+    this.https = https;
     this.host = host;
     this.port = port;
-    this.https = https;
     this.wwwDir = wwwDir;
     this.attachServer = attachServer;
     this.detachServer = detachServer;
@@ -82,10 +82,18 @@ class Server extends Bundle {
 
   async listen () {
     if (this.https) {
-      throw new Error('Unimplemented yet');
+      logInfo('Generate self signed certificate');
+      const selfsigned = require('selfsigned');
+      const attrs = [{ name: 'commonName', value: 'localhost' }];
+      const pems = selfsigned.generate(attrs, { days: 365 });
+      const options = {
+        key: pems.private,
+        cert: pems.cert,
+      };
+      this._server = https.createServer(options, this.callback());
+    } else {
+      this._server = http.createServer(this.callback());
     }
-
-    this._server = http.createServer(this.callback());
 
     await this.attach(this._server);
 

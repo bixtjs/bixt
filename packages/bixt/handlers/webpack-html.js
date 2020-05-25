@@ -1,12 +1,11 @@
 module.exports = function () {
-  return function webpackHtml ({ chunk, staticPages, webpackAssets }) {
-    if (chunk.ext !== '.html') {
+  return function webpackHtml ({ chunk: { file, absFile, uri, ext }, staticPages, webpackAssets }) {
+    if (ext !== '.html') {
       return;
     }
 
-    const { file, uri } = chunk;
     const loader = '!!url-loader';
-    staticPages.push({ uri, file, loader });
+    staticPages.push({ uri, absFile, loader });
     webpackAssets.push({ uri, file });
 
     return true;

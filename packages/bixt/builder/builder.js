@@ -88,16 +88,16 @@ class Builder {
         }
       }
 
-      await walk(pageDir, async file => {
-        const uri = this.pathToUri(file);
-        const shortFile = file.split(workDir).pop().slice(1);
+      await walk(pageDir, async absFile => {
+        const uri = this.pathToUri(absFile);
+        const file = absFile.split(workDir).pop().slice(1);
 
-        ctx.chunk = { file, uri, shortFile };
+        ctx.chunk = { absFile, uri, file };
 
         for (const handler of this.handlers) {
           try {
             if (await handler(ctx)) {
-              logInfo('Handling [%s] %s -> %s [%s]', colors.green('done'), shortFile, uri, handler.name);
+              logInfo('Handling [%s] %s -> %s [%s]', colors.green('done'), file, uri, handler.name);
               return;
             }
           } catch (err) {
@@ -105,7 +105,7 @@ class Builder {
           }
         }
 
-        logInfo('Handling [%s] %s -> %s', colors.red('fail'), shortFile, uri);
+        logInfo('Handling [%s] %s -> %s', colors.red('fail'), file, uri);
       });
 
       await this.writeFile('index.js', await this.renderTemplate('index.js', ctx));

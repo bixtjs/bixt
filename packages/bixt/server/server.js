@@ -17,6 +17,7 @@ class Server extends Bundle {
     port = 3000,
     srcDir,
     wwwDir,
+    workDir,
     attachServer = NOOP,
     detachServer = NOOP,
   } = {}) {
@@ -25,6 +26,7 @@ class Server extends Bundle {
     this.https = https;
     this.host = host;
     this.port = port;
+    this.workDir = workDir;
     this.wwwDir = wwwDir;
     this.attachServer = attachServer;
     this.detachServer = detachServer;
@@ -45,7 +47,7 @@ class Server extends Bundle {
 
     bonoAssets.forEach(({ uri, file, jsExported }) => {
       if (!jsExported) {
-        jsExported = require(file);
+        jsExported = require(path.join(this.workDir, file));
       }
 
       const firstLine = jsExported.toString().split('\n').shift();
